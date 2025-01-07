@@ -7,7 +7,13 @@ Learn how Redis works. Covers the following Redis features:
 - [ ] Buffer Parsing
 - [ ] Replication
 - [ ] Commands
+  - [ ] PING
+  - [ ] GET
+  - [ ] SET
+  - [ ] PUBLISH
+  - [ ] SUBSCRIBE
 - [ ] CMD Interface
+- [ ] OpenTelemetry
 
 ## Dependencies
 - Tokio
