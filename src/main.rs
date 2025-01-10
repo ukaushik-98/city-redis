@@ -1,6 +1,9 @@
 use anyhow::Result;
 use clap::Parser;
-use tokio::{io::AsyncWriteExt, net::TcpListener};
+use tokio::{
+    io::{AsyncReadExt, AsyncWriteExt},
+    net::TcpListener,
+};
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -23,9 +26,23 @@ async fn main() -> Result<()> {
     loop {
         let (mut stream, _) = listener.accept().await?;
         let _ = tokio::spawn(async move {
-            match stream.write_all(b"HTTP/1.1 200 OK\r\n\r\n").await {
-                Ok(_) => println!("Pusehd 200"),
-                Err(err) => panic!("{}", err),
+            let mut buf = vec![0; 1024];
+
+            // In a loop, read data from the stream and write the data back.
+            loop {
+                let n = stream
+                    .read_buf(&mut buf)
+                    .await
+                    .expect("failed to read data from stream");
+
+                if n == 0 {
+                    return;
+                }
+
+                stream
+                    .write_all(b"HTTP/1.1 200 OK\r\n\r\n")
+                    .await
+                    .expect("failed to write data to stream");
             }
         });
     }
